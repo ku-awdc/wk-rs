@@ -110,6 +110,6 @@ fn main() {
         // warning that isn't useful
         .flag("-Wno-unused-parameter")
         .extra_warnings(true)
-        .static_flag(true)
+        .shared_flag(true)
         .compile("wk");
 }
