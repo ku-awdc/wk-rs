@@ -22,19 +22,22 @@ fn main() {
 
     dbg!(&r_include, &r_tools_soft);
 
-
     let bindings = bindgen::builder()
         .clang_args(r_include.split_ascii_whitespace())
-        .detect_include_paths(true)
+        // .detect_include_paths(true)
         .clang_arg(format!("-I{}", r_tools_soft.join("include").display()))
-        // .clang_arg("-std=gnu2x")
-        // .clang_args("-O2 -Wall -std=gnu2x -mfpmath=sse -msse2 -mstackrealign".split_ascii_whitespace())
         // ignore some gcc specific attributes are used
-        .clang_arg("-Wno-ignored-attributes")
+        // .clang_arg("-Wno-ignored-attributes")
+        
+        // various options.. that might need to be removed.
+        // .clang_args("-O2 -Wall -std=gnu2x -mfpmath=sse -msse2 -mstackrealign".split_ascii_whitespace())
+        // .clang_arg("-std=gnu2x")
         // .clang_args("-shared -s -static-libgcc".split_ascii_whitespace())
         // .clang_arg("-shared")
         // .clang_arg("-Llibgcc_mock")
         // .clang_arg("-static-libgcc")
+
+        // this ensures only these things are included in the bindgen
         .allowlist_file("wk/inst/include/wk-v1.h")
         .allowlist_file("wk/inst/include/wk-v1-impl.c")
         // .allowlist_file("wk/inst/include/wk/experimental/wk-v1-filter-cpp11.hpp")
