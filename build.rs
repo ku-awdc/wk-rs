@@ -54,6 +54,7 @@ fn main() {
     bindings
         .clone()
         .header("wk/inst/include/wk-v1.h")
+        .layout_tests(false)
         .generate()
         .unwrap()
         .write_to_file("src/bindings_wk.rs")
