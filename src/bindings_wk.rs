@@ -8,7 +8,10 @@ pub const WK_FLAG_HAS_Z: u32 = 2;
 pub const WK_FLAG_HAS_M: u32 = 4;
 pub const WK_FLAG_DIMS_UNKNOWN: u32 = 8;
 pub const WK_PRECISION_NONE: f64 = 0.0;
+pub const WK_PART_ID_NONE: u32 = 4294967295;
+pub const WK_SIZE_UNKNOWN: u32 = 4294967295;
 pub const WK_VECTOR_SIZE_UNKNOWN: i32 = -1;
+pub const WK_SRID_NONE: u32 = 4294967295;
 pub type R_xlen_t = isize;
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
