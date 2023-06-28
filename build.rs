@@ -1,26 +1,24 @@
-use std::{path::PathBuf, process::Command};
+use std::process::Command;
+
+pub fn run_r_cmd_config(flag: &str) -> String {
+    let r_cmd_config_flag = Command::new("R")
+        .args(["CMD", "config", flag])
+        .output()
+        .unwrap()
+        .stdout;
+    let result = String::from_utf8(r_cmd_config_flag).unwrap();
+    let result = result.trim();
+    result.to_string()
+}
 
 fn main() {
     // UNCOMMENT if you need the linker...
-    // println!("cargo:rustc-link-search=libgcc_mock");
-    let cppflags = Command::new("R")
-        .args(["CMD", "config", "--cppflags"])
-        .output()
-        .unwrap()
-        .stdout;
-    let r_include = String::from_utf8(cppflags).unwrap();
-    let r_include = r_include.trim();
+    println!("cargo:rustc-link-search=libgcc_mock");
+    let cppflags = run_r_cmd_config("--cppflags");
 
-    let r_tools_soft = Command::new("R")
-        .args(["CMD", "config", "R_TOOLS_SOFT"])
-        .output()
-        .unwrap()
-        .stdout;
-    let r_tools_soft = String::from_utf8(r_tools_soft).unwrap();
-    let r_tools_soft = r_tools_soft.trim();
-    let r_tools_soft = PathBuf::from(r_tools_soft);
+    let r_tools_soft = run_r_cmd_config("R_TOOLS_SOFT");
 
-    dbg!(&r_include, &r_tools_soft);
+    dbg!(&cppflags, &r_tools_soft);
     println!("cargo:rerun-if-changed=build.rs");
 
     let bindings = bindgen::builder()
@@ -41,10 +39,13 @@ fn main() {
 
         .sort_semantically(true)
         .layout_tests(false)
+        // .default_macro_constant_type(bindgen::MacroTypeVariation::Signed)
         
-        .clang_args(r_include.split_ascii_whitespace())
+        .wrap_unsafe_ops(true)
+
+        .clang_args(cppflags.split_ascii_whitespace())
         // .detect_include_paths(true)
-        .clang_arg(format!("-I{}", r_tools_soft.join("include").display()))
+        .clang_arg(format!("-I{r_tools_soft}/include"))
         // ignore some gcc specific attributes are used
         // .clang_arg("-Wno-ignored-attributes")
 
@@ -89,4 +90,26 @@ fn main() {
     //     .unwrap()
     //     .write_to_file("src/bindings_wk_filter.rs")
     //     .unwrap();
+
+    let ldflags = run_r_cmd_config("--ldflags");
+    dbg!(&ldflags);
+
+    let mut wk_build = cc::Build::new();
+    let mut wk_build = wk_build
+        .cargo_metadata(true)
+        // .compiler(compiler)
+        // .cpp(true)
+        .file("wk/inst/include/wk-v1-impl.c");
+    for flag in cppflags
+        .split_ascii_whitespace()
+        .chain(ldflags.split_ascii_whitespace())
+    {
+        println!("cargo:rustc-link-arg={}", flag);
+        wk_build = wk_build.flag(flag);
+    }
+
+    wk_build
+        .extra_warnings(true)
+        .static_flag(true)
+        .compile("wk");
 }
