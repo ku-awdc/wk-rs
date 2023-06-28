@@ -29,6 +29,7 @@ fn main() {
         .rustified_enum(".*")
 
         .sort_semantically(true)
+        .layout_tests(false)
         .clang_args(r_include.split_ascii_whitespace())
         // .detect_include_paths(true)
         .clang_arg(format!("-I{}", r_tools_soft.join("include").display()))
