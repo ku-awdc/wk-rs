@@ -165,14 +165,8 @@ pub enum wk_geometery_type_enum {
 }
 extern "C" {
     pub fn wk_handler_create() -> *mut wk_handler_t;
-}
-extern "C" {
     pub fn wk_handler_create_xptr(handler: *mut wk_handler_t, tag: SEXP, prot: SEXP) -> SEXP;
-}
-extern "C" {
     pub fn wk_handler_destroy(handler: *mut wk_handler_t);
-}
-extern "C" {
     pub fn wk_handler_run_xptr(
         read_fun: ::std::option::Option<
             unsafe extern "C" fn(read_data: SEXP, handler: *mut wk_handler_t) -> SEXP,
@@ -180,13 +174,7 @@ extern "C" {
         read_data: SEXP,
         xptr: SEXP,
     ) -> SEXP;
-}
-extern "C" {
     pub fn wk_trans_create() -> *mut wk_trans_t;
-}
-extern "C" {
     pub fn wk_trans_create_xptr(trans: *mut wk_trans_t, tag: SEXP, prot: SEXP) -> SEXP;
-}
-extern "C" {
     pub fn wk_trans_destroy(trans: *mut wk_trans_t);
 }

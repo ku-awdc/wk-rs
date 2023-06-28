@@ -29,7 +29,7 @@ fn main() {
 
         // .wrap_unsafe_ops(true)
         // only affected `wk_geometery_type_enum_type`
-        // .translate_enum_integer_types(true)
+        .merge_extern_blocks(true)
 
         // only affected `wk_geometery_type_enum`
         .rustified_enum(".*")
