@@ -28,7 +28,7 @@ fn main() {
         .clang_arg(format!("-I{}", r_tools_soft.join("include").display()))
         // ignore some gcc specific attributes are used
         // .clang_arg("-Wno-ignored-attributes")
-        
+
         // various options.. that might need to be removed.
         // .clang_args("-O2 -Wall -std=gnu2x -mfpmath=sse -msse2 -mstackrealign".split_ascii_whitespace())
         // .clang_arg("-std=gnu2x")
