@@ -97,8 +97,6 @@ fn main() {
     let mut wk_build = cc::Build::new();
     let mut wk_build = wk_build
         .cargo_metadata(true)
-        // .compiler(compiler)
-        // .cpp(true)
         .file("wk/inst/include/wk-v1-impl.c");
     for flag in cppflags
         .split_ascii_whitespace()
@@ -109,6 +107,8 @@ fn main() {
     }
 
     wk_build
+        // warning that isn't useful
+        .flag("-Wno-unused-parameter")
         .extra_warnings(true)
         .static_flag(true)
         .compile("wk");
