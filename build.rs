@@ -1,6 +1,8 @@
 use std::{path::PathBuf, process::Command};
 
 fn main() {
+    // UNCOMMENT if you need the linker...
+    // println!("cargo:rustc-link-search=libgcc_mock");
     let cppflags = Command::new("R")
         .args(["CMD", "config", "--cppflags"])
         .output()
@@ -20,7 +22,6 @@ fn main() {
 
     dbg!(&r_include, &r_tools_soft);
 
-    println!("cargo:rustc-link-search=libgcc_mock");
 
     let bindings = bindgen::builder()
         .clang_args(r_include.split_ascii_whitespace())

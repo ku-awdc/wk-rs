@@ -1,0 +1,9 @@
+# [env]
+# LIBRSYS_LIBCLANG_INCLUDE_PATH = "C:/rtools43/x86_64-w64-mingw32.static.posix/include"
+
+# [build]
+# # target-dir = "target"
+# target = "x86_64-pc-windows-gnu"
+
+# [target.x86_64-pc-windows-gnu]
+# linker = "x86_64-w64-mingw32.static.posix-gcc.exe"
