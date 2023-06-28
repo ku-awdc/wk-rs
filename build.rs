@@ -24,12 +24,24 @@ fn main() {
     println!("cargo:rerun-if-changed=build.rs");
 
     let bindings = bindgen::builder()
-        
+        // does nothing
+        // .array_pointers_in_arguments(true)
+
+        // .wrap_unsafe_ops(true)
+        // only affected `wk_geometery_type_enum_type`
+        // .translate_enum_integer_types(true)
+
         // only affected `wk_geometery_type_enum`
         .rustified_enum(".*")
 
+        // does nothing
+        .enable_function_attribute_detection()
+
+        // .enable_cxx_namespaces()
+
         .sort_semantically(true)
         .layout_tests(false)
+        
         .clang_args(r_include.split_ascii_whitespace())
         // .detect_include_paths(true)
         .clang_arg(format!("-I{}", r_tools_soft.join("include").display()))
