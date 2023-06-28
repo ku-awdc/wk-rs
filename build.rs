@@ -114,6 +114,7 @@ fn main() {
 
     wk_build
         // warning that isn't useful
+        .flag("-s")
         .flag("-Wno-unused-parameter")
         .extra_warnings(true)
         .shared_flag(true)
