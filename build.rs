@@ -21,6 +21,7 @@ fn main() {
     let r_tools_soft = PathBuf::from(r_tools_soft);
 
     dbg!(&r_include, &r_tools_soft);
+    println!("cargo:rerun-if-changed=build.rs");
 
     let bindings = bindgen::builder()
         .clang_args(r_include.split_ascii_whitespace())
