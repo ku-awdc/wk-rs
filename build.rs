@@ -106,6 +106,12 @@ fn main() {
         wk_build = wk_build.flag(flag);
     }
 
+    let cxx23flags = run_r_cmd_config("CXX23FLAGS");
+    dbg!(&cxx23flags);
+    for flag in cxx23flags.split_ascii_whitespace() {
+        wk_build = wk_build.flag(flag);
+    }
+
     wk_build
         // warning that isn't useful
         .flag("-Wno-unused-parameter")
