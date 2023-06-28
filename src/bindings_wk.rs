@@ -19,15 +19,18 @@ pub struct SEXPREC {
     _unused: [u8; 0],
 }
 pub type SEXP = *mut SEXPREC;
-pub const wk_geometery_type_enum_WK_GEOMETRY: wk_geometery_type_enum = 0;
-pub const wk_geometery_type_enum_WK_POINT: wk_geometery_type_enum = 1;
-pub const wk_geometery_type_enum_WK_LINESTRING: wk_geometery_type_enum = 2;
-pub const wk_geometery_type_enum_WK_POLYGON: wk_geometery_type_enum = 3;
-pub const wk_geometery_type_enum_WK_MULTIPOINT: wk_geometery_type_enum = 4;
-pub const wk_geometery_type_enum_WK_MULTILINESTRING: wk_geometery_type_enum = 5;
-pub const wk_geometery_type_enum_WK_MULTIPOLYGON: wk_geometery_type_enum = 6;
-pub const wk_geometery_type_enum_WK_GEOMETRYCOLLECTION: wk_geometery_type_enum = 7;
-pub type wk_geometery_type_enum = ::std::os::raw::c_int;
+#[repr(i32)]
+#[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
+pub enum wk_geometery_type_enum {
+    WK_GEOMETRY = 0,
+    WK_POINT = 1,
+    WK_LINESTRING = 2,
+    WK_POLYGON = 3,
+    WK_MULTIPOINT = 4,
+    WK_MULTILINESTRING = 5,
+    WK_MULTIPOLYGON = 6,
+    WK_GEOMETRYCOLLECTION = 7,
+}
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct wk_meta_t {

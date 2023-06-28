@@ -24,6 +24,10 @@ fn main() {
     println!("cargo:rerun-if-changed=build.rs");
 
     let bindings = bindgen::builder()
+        
+        // only affected `wk_geometery_type_enum`
+        .rustified_enum(".*")
+
         .clang_args(r_include.split_ascii_whitespace())
         // .detect_include_paths(true)
         .clang_arg(format!("-I{}", r_tools_soft.join("include").display()))
