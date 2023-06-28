@@ -1,3 +1,6 @@
 [submodule "wk"]
 	path = wk
 	url = https://github.com/paleolimbot/wk.git
+[submodule "cpp11"]
+	path = cpp11
+	url = https://github.com/r-lib/cpp11.git
