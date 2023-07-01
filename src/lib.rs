@@ -7,6 +7,11 @@ pub mod bindings {
         use libR_sys::*;
         include!("bindings_wk.rs");
     }
+    pub mod wk_default {
+        use libR_sys::*;
+        use super::wk::*;
+        include!("bindings_wk_default_impl.rs");
+    }
 }
 
 #[cfg(test)]

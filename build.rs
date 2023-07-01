@@ -78,6 +78,14 @@ fn export_bindings(cppflags: &String) {
         .write_to_file("src/bindings_wk.rs")
         .unwrap();
 
+    bindings
+        .blocklist_file("wk/inst/include/wk-v1.h")
+        .header("wk/inst/include/wk-v1-impl.c")
+        .generate()
+        .unwrap()
+        .write_to_file("src/bindings_wk_default_impl.rs")
+        .unwrap();
+
     // wk\inst\include\wk\experimental\wk-v1-filter-cpp11.hpp
     // this isn't building on msvc
     // bindings
