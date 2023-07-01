@@ -144,7 +144,7 @@ pub const WK_PART_ID_NONE: u32 = 4294967295;
 pub const WK_SIZE_UNKNOWN: u32 = 4294967295;
 pub const WK_VECTOR_SIZE_UNKNOWN: i32 = -1;
 pub const WK_SRID_NONE: u32 = 4294967295;
-#[repr(i32)]
+#[repr(u32)]
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum wk_geometery_type_enum {
     WK_GEOMETRY = 0,
