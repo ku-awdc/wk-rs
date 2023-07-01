@@ -101,6 +101,11 @@ fn export_bindings(cppflags: &String) {
         // this ensures only these things are included in the bindgen
         .allowlist_file("wk/inst/include/wk-v1.h")
         .allowlist_file("wk/inst/include/wk-v1-impl.c")
+        // FIXME: maybe do this instead?
+        // .blocklist_file("Rinternals.h")
+        // blocking items from `Rinternals.h` specifically, and using libR-sys
+        // equivalent types (items)
+        .blocklist_item("SEXP|SEXPREC|R_xlen_t")
         // .allowlist_file("wk/inst/include/wk/experimental/wk-v1-filter-cpp11.hpp")
         // .allowlist_file("wk/inst/include/wk/experimental/wk-v1-handler-cpp11.hpp")
         // .allowlist_file("wk/inst/include/wk/experimental/wk-v1-reader-cpp11.hpp")
