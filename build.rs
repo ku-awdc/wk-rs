@@ -17,10 +17,9 @@ pub fn run_r_cmd_config(flag: &str) -> String {
 
 #[cfg(feature = "export_bindings")]
 fn export_bindings(cppflags: &String) {
-    let r_tools_soft = run_r_cmd_config("R_TOOLS_SOFT");
     println!("cargo:rerun-if-changed=build.rs");
 
-    let bindings = bindgen::builder()
+    let mut bindings = bindgen::builder()
         // does nothing
         // .array_pointers_in_arguments(true)
 
@@ -44,7 +43,6 @@ fn export_bindings(cppflags: &String) {
 
         .clang_args(cppflags.split_ascii_whitespace())
         // .detect_include_paths(true)
-        .clang_arg(format!("-I{r_tools_soft}/include"))
         // ignore some gcc specific attributes are used
         // .clang_arg("-Wno-ignored-attributes")
 
@@ -68,6 +66,12 @@ fn export_bindings(cppflags: &String) {
         // .allowlist_file("wk/inst/include/wk/experimental/wk-v1-handler-cpp11.hpp")
         // .allowlist_file("wk/inst/include/wk/experimental/wk-v1-reader-cpp11.hpp")
         ;
+
+    if cfg!(windows) {
+        let r_tools_soft = run_r_cmd_config("R_TOOLS_SOFT");
+        bindings = bindings.clang_arg(format!("-I{r_tools_soft}/include"));
+    }
+    let bindings = bindings;
 
     bindings
         .clone()
@@ -113,6 +117,9 @@ struct AddMissingDerivs;
 impl bindgen::callbacks::ParseCallbacks for AddMissingDerivs {
     fn add_derives(&self, info: &bindgen::callbacks::DeriveInfo<'_>) -> Vec<String> {
         let mut result = Vec::new();
+
+        // added due to missing R types definition causes bindgen to omit
+        // these traits
         if info.name == "wk_vector_meta_t" {
             result.push("Debug".to_string());
             result.push("Copy".to_string());
@@ -124,8 +131,9 @@ impl bindgen::callbacks::ParseCallbacks for AddMissingDerivs {
 }
 
 fn main() {
-    // UNCOMMENT if you need the linker...
-    println!("cargo:rustc-link-search=libgcc_mock");
+    if cfg!(windows) {
+        println!("cargo:rustc-link-search=libgcc_mock");
+    }
     let cppflags = run_r_cmd_config("--cppflags");
 
     #[cfg(feature = "export_bindings")]
