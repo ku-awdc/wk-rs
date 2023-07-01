@@ -8,8 +8,8 @@ pub mod bindings {
         include!("bindings_wk.rs");
     }
     pub mod wk_default {
-        use libR_sys::*;
         use super::wk::*;
+        use libR_sys::*;
         include!("bindings_wk_default_impl.rs");
     }
 }

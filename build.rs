@@ -117,7 +117,7 @@ struct AddMissingDerivs;
 impl bindgen::callbacks::ParseCallbacks for AddMissingDerivs {
     fn add_derives(&self, info: &bindgen::callbacks::DeriveInfo<'_>) -> Vec<String> {
         let mut result = Vec::new();
-        
+
         // added due to missing R types definition causes bindgen to omit
         // these traits
         if info.name == "wk_vector_meta_t" {
@@ -131,8 +131,10 @@ impl bindgen::callbacks::ParseCallbacks for AddMissingDerivs {
 }
 
 fn main() {
-    // UNCOMMENT if you need the linker...
-    println!("cargo:rustc-link-search=libgcc_mock");
+    // on windows we need to set the linker to the one from Rtools
+    if cfg!(windows) {
+        println!("cargo:rustc-link-search=libgcc_mock");
+    }
     let cppflags = run_r_cmd_config("--cppflags");
 
     #[cfg(feature = "export_bindings")]
