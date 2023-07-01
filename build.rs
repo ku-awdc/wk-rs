@@ -131,7 +131,6 @@ impl bindgen::callbacks::ParseCallbacks for AddMissingDerivs {
 }
 
 fn main() {
-    // on windows we need to set the linker to the one from Rtools
     if cfg!(windows) {
         println!("cargo:rustc-link-search=libgcc_mock");
     }
