@@ -12,6 +12,7 @@ pub struct wk_meta_t {
     pub bounds_max: [f64; 4usize],
 }
 #[repr(C)]
+#[derive(Debug, Copy, Clone)]
 pub struct wk_vector_meta_t {
     pub geometry_type: u32,
     pub flags: u32,
