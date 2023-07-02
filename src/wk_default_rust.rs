@@ -3,15 +3,6 @@
 use crate::bindings::wk::*;
 use libR_sys::*;
 
-#[repr(C)]
-pub struct wk_handler_run_data {
-    pub read_fun: ::std::option::Option<
-        unsafe extern "C" fn(read_data: SEXP, handler: *mut wk_handler_t) -> SEXP,
-    >,
-    pub read_data: SEXP,
-    pub handler: *mut wk_handler_t,
-}
-
 #[no_mangle]
 pub unsafe extern "C" fn wk_default_handler_initialize(
     dirty: *mut ::std::os::raw::c_int,
@@ -140,11 +131,56 @@ pub unsafe extern "C" fn wk_handler_destroy(handler: *mut wk_handler_t) {
     }
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn wk_handler_destroy_xptr(xptr: SEXP) {
+    wk_handler_destroy(R_ExternalPtrAddr(xptr) as _);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn wk_handler_create_xptr(
+    handler: *mut wk_handler_t,
+    tag: SEXP,
+    prot: SEXP,
+) -> SEXP {
+    let xptr = R_MakeExternalPtr(handler as _, tag, prot);
+    R_RegisterCFinalizerEx(xptr, Some(wk_handler_destroy_xptr), Rboolean_FALSE);
+    xptr
+}
+
+#[repr(C)]
+pub struct wk_handler_run_data {
+    pub read_fun: ::std::option::Option<
+        unsafe extern "C" fn(read_data: SEXP, handler: *mut wk_handler_t) -> SEXP,
+    >,
+    pub read_data: SEXP,
+    pub handler: *mut wk_handler_t,
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn wk_handler_run_cleanup(data: *mut ::std::os::raw::c_void) {
+    // let run_data = data as *mut wk_handler_run_data;
+    let run_data = data.cast::<wk_handler_run_data>();
+    let handler = *(*run_data).handler;
+    (handler.deinitialize.unwrap())(handler.handler_data);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn wk_handler_run_internal(data: *mut ::std::os::raw::c_void) -> SEXP {
+    let run_data = data.cast::<wk_handler_run_data>();
+    let api_version = (*(*run_data).handler).api_version;
+    if api_version != 1 {
+        Rf_error(format!("Can't run a wk_handler with api_version {api_version}").as_ptr() as _)
+    }
+
+    (((*(*run_data).handler).initialize).unwrap())(
+        &mut (*(*run_data).handler).dirty,
+        (*(*run_data).handler).handler_data,
+    );
+
+    ((*run_data).read_fun.unwrap())((*run_data).read_data, (*run_data).handler)
+}
+
 extern "C" {
-    pub fn wk_handler_destroy_xptr(xptr: SEXP);
-    pub fn wk_handler_create_xptr(handler: *mut wk_handler_t, tag: SEXP, prot: SEXP) -> SEXP;
-    pub fn wk_handler_run_cleanup(data: *mut ::std::os::raw::c_void);
-    pub fn wk_handler_run_internal(data: *mut ::std::os::raw::c_void) -> SEXP;
     pub fn wk_handler_run_xptr(
         read_fun: ::std::option::Option<
             unsafe extern "C" fn(read_data: SEXP, handler: *mut wk_handler_t) -> SEXP,
