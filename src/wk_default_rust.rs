@@ -101,39 +101,46 @@ pub unsafe extern "C" fn wk_handler_create() -> *mut wk_handler_t {
     let handler = std::alloc::alloc(layout) as *mut wk_handler_t;
     if handler.is_null() {
         Rf_error("Failed to alloc handler".as_ptr() as _);
-        // suggestion: 
+        // suggestion:
         // std::alloc::handle_alloc_error(layout);
     }
     (*handler).api_version = 1;
     (*handler).dirty = 0;
     (*handler).handler_data = std::ptr::null_mut();
-  
+
     (*handler).initialize = Some(wk_default_handler_initialize);
     (*handler).vector_start = Some(wk_default_handler_vector_start);
     (*handler).vector_end = Some(wk_default_handler_vector_end);
-  
+
     (*handler).feature_start = Some(wk_default_handler_feature);
     (*handler).null_feature = Some(wk_default_handler_null_feature);
     (*handler).feature_end = Some(wk_default_handler_feature);
-  
+
     (*handler).geometry_start = Some(wk_default_handler_geometry);
     (*handler).geometry_end = Some(wk_default_handler_geometry);
-  
+
     (*handler).ring_start = Some(wk_default_handler_ring);
     (*handler).ring_end = Some(wk_default_handler_ring);
-  
+
     (*handler).coord = Some(wk_default_handler_coord);
-  
+
     //FIXME: this field is not mentioned in header of `wk_handler_t`.
     // (*handler).error = Some(wk_default_handler_error);
     (*handler).deinitialize = Some(wk_default_handler_finalizer);
     (*handler).finalizer = Some(wk_default_handler_finalizer);
-  
+
     handler
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn wk_handler_destroy(handler: *mut wk_handler_t) {
+    if !handler.is_null() {
+        (((*handler).finalizer).unwrap())((*handler).handler_data);
+        std::alloc::dealloc(handler as _, std::alloc::Layout::new::<wk_handler_t>());
+    }
+}
+
 extern "C" {
-    pub fn wk_handler_destroy(handler: *mut wk_handler_t);
     pub fn wk_handler_destroy_xptr(xptr: SEXP);
     pub fn wk_handler_create_xptr(handler: *mut wk_handler_t, tag: SEXP, prot: SEXP) -> SEXP;
     pub fn wk_handler_run_cleanup(data: *mut ::std::os::raw::c_void);
