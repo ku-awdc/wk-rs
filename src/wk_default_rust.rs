@@ -203,17 +203,34 @@ pub unsafe extern "C" fn wk_handler_run_xptr(
     )
 }
 
+// region: trans
+
+#[no_mangle]
+pub unsafe extern "C" fn wk_default_trans_trans(
+    _feature_id: R_xlen_t,
+    xyzm_in: *const f64,
+    xyzm_out: *mut f64,
+    _trans_data: *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    *xyzm_out.add(0) = *xyzm_in.add(0);
+    *xyzm_out.add(1) = *xyzm_in.add(1);
+    *xyzm_out.add(2) = *xyzm_in.add(2);
+    *xyzm_out.add(3) = *xyzm_in.add(3);
+
+    WK_CONTINUE
+}
+
+#[no_mangle]
+pub extern "C" fn wk_default_trans_finalizer(_trans_data: *mut ::std::os::raw::c_void) {}
+
+#[no_mangle]
+pub extern "C" fn wk_default_trans_vector(_trans_data: *mut ::std::os::raw::c_void) {}
+
 extern "C" {
-    pub fn wk_default_trans_trans(
-        feature_id: R_xlen_t,
-        xyzm_in: *const f64,
-        xyzm_out: *mut f64,
-        trans_data: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-    pub fn wk_default_trans_finalizer(trans_data: *mut ::std::os::raw::c_void);
-    pub fn wk_default_trans_vector(trans_data: *mut ::std::os::raw::c_void);
     pub fn wk_trans_create() -> *mut wk_trans_t;
     pub fn wk_trans_destroy(trans: *mut wk_trans_t);
     pub fn wk_trans_destroy_xptr(trans_xptr: SEXP);
     pub fn wk_trans_create_xptr(trans: *mut wk_trans_t, tag: SEXP, prot: SEXP) -> SEXP;
 }
+
+// endregion
