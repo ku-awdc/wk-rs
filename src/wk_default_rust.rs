@@ -30,41 +30,72 @@ pub extern "C" fn wk_default_handler_vector_start(
     WK_CONTINUE
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn wk_default_handler_vector_end(
+    _meta: *const wk_vector_meta_t,
+    _handler_data: *mut ::std::os::raw::c_void,
+) -> SEXP {
+    R_NilValue
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn wk_default_handler_feature(
+    _meta: *const wk_vector_meta_t,
+    _feat_id: R_xlen_t,
+    _handler_data: *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    WK_CONTINUE
+}
+
+#[no_mangle]
+pub extern "C" fn wk_default_handler_null_feature(
+    _handler_data: *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    WK_CONTINUE
+}
+
+#[no_mangle]
+pub extern "C" fn wk_default_handler_geometry(
+    _meta: *const wk_meta_t,
+    _part_id: u32,
+    _handler_data: *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    WK_CONTINUE
+}
+
+#[no_mangle]
+pub extern "C" fn wk_default_handler_ring(
+    _meta: *const wk_meta_t,
+    _size: u32,
+    _ring_id: u32,
+    _handler_data: *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    WK_CONTINUE
+}
+
+#[no_mangle]
+pub extern "C" fn wk_default_handler_coord(
+    _meta: *const wk_meta_t,
+    _coord: *const f64,
+    _coord_id: u32,
+    _handler_data: *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    WK_CONTINUE
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn wk_default_handler_error(
+    message: *const ::std::os::raw::c_char,
+    _handler_data: *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    // never ending, thus no need to return a value
+    Rf_error(message);
+    // WK_ABORT
+}
+#[no_mangle]
+pub unsafe extern "C" fn wk_default_handler_finalizer(_handler_data: *mut ::std::os::raw::c_void) {}
+
 extern "C" {
-    pub fn wk_default_handler_vector_end(
-        meta: *const wk_vector_meta_t,
-        handler_data: *mut ::std::os::raw::c_void,
-    ) -> SEXP;
-    pub fn wk_default_handler_feature(
-        meta: *const wk_vector_meta_t,
-        feat_id: R_xlen_t,
-        handler_data: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-    pub fn wk_default_handler_null_feature(
-        handler_data: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-    pub fn wk_default_handler_geometry(
-        meta: *const wk_meta_t,
-        part_id: u32,
-        handler_data: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-    pub fn wk_default_handler_ring(
-        meta: *const wk_meta_t,
-        size: u32,
-        ring_id: u32,
-        handler_data: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-    pub fn wk_default_handler_coord(
-        meta: *const wk_meta_t,
-        coord: *const f64,
-        coord_id: u32,
-        handler_data: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-    pub fn wk_default_handler_error(
-        message: *const ::std::os::raw::c_char,
-        handler_data: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
-    pub fn wk_default_handler_finalizer(handler_data: *mut ::std::os::raw::c_void);
     pub fn wk_handler_create() -> *mut wk_handler_t;
     pub fn wk_handler_destroy(handler: *mut wk_handler_t);
     pub fn wk_handler_destroy_xptr(xptr: SEXP);
