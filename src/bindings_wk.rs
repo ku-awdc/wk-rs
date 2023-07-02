@@ -132,9 +132,9 @@ pub struct wk_trans_t {
     pub finalizer:
         ::std::option::Option<unsafe extern "C" fn(trans_data: *mut ::std::os::raw::c_void)>,
 }
-pub const WK_CONTINUE: u32 = 0;
-pub const WK_ABORT: u32 = 1;
-pub const WK_ABORT_FEATURE: u32 = 2;
+pub const WK_CONTINUE: i32 = 0;
+pub const WK_ABORT: i32 = 1;
+pub const WK_ABORT_FEATURE: i32 = 2;
 pub const WK_FLAG_HAS_BOUNDS: u32 = 1;
 pub const WK_FLAG_HAS_Z: u32 = 2;
 pub const WK_FLAG_HAS_M: u32 = 4;

@@ -1,3 +1,5 @@
+//! This is equivalent to code written in `wk-v1-impl.c`.
+//!
 use crate::bindings::wk::*;
 use libR_sys::*;
 
@@ -11,7 +13,7 @@ pub struct wk_handler_run_data {
 }
 
 #[no_mangle]
-unsafe extern "C" fn wk_default_handler_initialize(
+pub unsafe extern "C" fn wk_default_handler_initialize(
     dirty: *mut ::std::os::raw::c_int,
     _handler_data: *mut ::std::os::raw::c_void,
 ) {
@@ -20,12 +22,15 @@ unsafe extern "C" fn wk_default_handler_initialize(
     }
     *dirty = 1;
 }
+#[no_mangle]
+pub extern "C" fn wk_default_handler_vector_start(
+    _meta: *const wk_vector_meta_t,
+    _handler_data: *mut ::std::os::raw::c_void,
+) -> ::std::os::raw::c_int {
+    WK_CONTINUE
+}
 
 extern "C" {
-    pub fn wk_default_handler_vector_start(
-        meta: *const wk_vector_meta_t,
-        handler_data: *mut ::std::os::raw::c_void,
-    ) -> ::std::os::raw::c_int;
     pub fn wk_default_handler_vector_end(
         meta: *const wk_vector_meta_t,
         handler_data: *mut ::std::os::raw::c_void,

@@ -128,6 +128,14 @@ impl bindgen::callbacks::ParseCallbacks for AddMissingDerivs {
 
         result
     }
+
+    fn int_macro(&self, name: &str, _value: i64) -> Option<bindgen::callbacks::IntKind> {
+        use bindgen::callbacks::IntKind;
+        match name {
+            "WK_CONTINUE" | "WK_ABORT" | "WK_ABORT_FEATURE" => Some(IntKind::I32),
+            _ => None,
+        }
+    }
 }
 
 fn main() {
