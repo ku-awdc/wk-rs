@@ -180,14 +180,30 @@ pub unsafe extern "C" fn wk_handler_run_internal(data: *mut ::std::os::raw::c_vo
     ((*run_data).read_fun.unwrap())((*run_data).read_data, (*run_data).handler)
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn wk_handler_run_xptr(
+    read_fun: ::std::option::Option<
+        unsafe extern "C" fn(read_data: SEXP, handler: *mut wk_handler_t) -> SEXP,
+    >,
+    read_data: SEXP,
+    xptr: SEXP,
+) -> SEXP {
+    use std::os::raw::c_void;
+    let handler = R_ExternalPtrAddr(xptr).cast::<wk_handler_t>();
+    let mut run_data = wk_handler_run_data {
+        read_fun,
+        read_data,
+        handler,
+    };
+    R_ExecWithCleanup(
+        Some(wk_handler_run_internal),
+        (&mut run_data as *mut _) as *mut c_void,
+        Some(wk_handler_run_cleanup),
+        (&mut run_data as *mut _) as *mut c_void,
+    )
+}
+
 extern "C" {
-    pub fn wk_handler_run_xptr(
-        read_fun: ::std::option::Option<
-            unsafe extern "C" fn(read_data: SEXP, handler: *mut wk_handler_t) -> SEXP,
-        >,
-        read_data: SEXP,
-        xptr: SEXP,
-    ) -> SEXP;
     pub fn wk_default_trans_trans(
         feature_id: R_xlen_t,
         xyzm_in: *const f64,
