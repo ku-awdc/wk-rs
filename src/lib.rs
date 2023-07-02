@@ -14,6 +14,7 @@ pub mod bindings {
     }
 }
 
+pub mod wk_default_rust;
 #[cfg(test)]
 mod tests {
     use super::*;
