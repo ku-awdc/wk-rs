@@ -9,7 +9,7 @@ pub unsafe extern "C" fn wk_default_handler_initialize(
     _handler_data: *mut ::std::os::raw::c_void,
 ) {
     if *dirty != 0 {
-        Rf_error("Can't re-use this wk_handler".as_ptr() as _);
+        Rf_error("Can't re-use this wk_handler".as_ptr().cast());
     }
     *dirty = 1;
 }
@@ -89,9 +89,9 @@ pub unsafe extern "C" fn wk_default_handler_finalizer(_handler_data: *mut ::std:
 #[no_mangle]
 pub unsafe extern "C" fn wk_handler_create() -> *mut wk_handler_t {
     let layout = std::alloc::Layout::new::<wk_handler_t>();
-    let handler = std::alloc::alloc(layout) as *mut wk_handler_t;
+    let handler = std::alloc::alloc(layout).cast::<wk_handler_t>();
     if handler.is_null() {
-        Rf_error("Failed to alloc handler".as_ptr() as _);
+        Rf_error("Failed to alloc handler".as_ptr().cast());
         // suggestion:
         // std::alloc::handle_alloc_error(layout);
     }
@@ -127,13 +127,13 @@ pub unsafe extern "C" fn wk_handler_create() -> *mut wk_handler_t {
 pub unsafe extern "C" fn wk_handler_destroy(handler: *mut wk_handler_t) {
     if !handler.is_null() {
         (((*handler).finalizer).unwrap())((*handler).handler_data);
-        std::alloc::dealloc(handler as _, std::alloc::Layout::new::<wk_handler_t>());
+        std::alloc::dealloc(handler.cast(), std::alloc::Layout::new::<wk_handler_t>());
     }
 }
 
 #[no_mangle]
 pub unsafe extern "C" fn wk_handler_destroy_xptr(xptr: SEXP) {
-    wk_handler_destroy(R_ExternalPtrAddr(xptr) as _);
+    wk_handler_destroy(R_ExternalPtrAddr(xptr).cast());
 }
 
 #[no_mangle]
@@ -142,7 +142,7 @@ pub unsafe extern "C" fn wk_handler_create_xptr(
     tag: SEXP,
     prot: SEXP,
 ) -> SEXP {
-    let xptr = R_MakeExternalPtr(handler as _, tag, prot);
+    let xptr = R_MakeExternalPtr(handler.cast(), tag, prot);
     R_RegisterCFinalizerEx(xptr, Some(wk_handler_destroy_xptr), Rboolean_FALSE);
     xptr
 }
@@ -169,7 +169,11 @@ pub unsafe extern "C" fn wk_handler_run_internal(data: *mut ::std::os::raw::c_vo
     let run_data = data.cast::<wk_handler_run_data>();
     let api_version = (*(*run_data).handler).api_version;
     if api_version != 1 {
-        Rf_error(format!("Can't run a wk_handler with api_version {api_version}").as_ptr() as _)
+        Rf_error(
+            format!("Can't run a wk_handler with api_version {api_version}")
+                .as_ptr()
+                .cast(),
+        )
     }
 
     (((*(*run_data).handler).initialize).unwrap())(
@@ -226,11 +230,62 @@ pub extern "C" fn wk_default_trans_finalizer(_trans_data: *mut ::std::os::raw::c
 #[no_mangle]
 pub extern "C" fn wk_default_trans_vector(_trans_data: *mut ::std::os::raw::c_void) {}
 
-extern "C" {
-    pub fn wk_trans_create() -> *mut wk_trans_t;
-    pub fn wk_trans_destroy(trans: *mut wk_trans_t);
-    pub fn wk_trans_destroy_xptr(trans_xptr: SEXP);
-    pub fn wk_trans_create_xptr(trans: *mut wk_trans_t, tag: SEXP, prot: SEXP) -> SEXP;
+#[no_mangle]
+pub unsafe extern "C" fn wk_trans_create() -> *mut wk_trans_t {
+    let layout = std::alloc::Layout::new::<wk_trans_t>();
+    let trans = std::alloc::alloc_zeroed(layout).cast::<wk_trans_t>();
+    if trans.is_null() {
+        Rf_error("Failed to alloc wk_trans_t*".as_ptr().cast());
+        // suggestion:
+        // std::alloc::handle_alloc_error(layout);
+    }
+
+    (*trans).api_version = 1001;
+    (*trans).use_z = R_NaInt; // NA_INTEGER is R_NaInt
+    (*trans).use_m = R_NaInt; // NA_INTEGER is R_NaInt
+
+    (*trans).xyzm_out_min[0] = R_NegInf;
+    (*trans).xyzm_out_min[1] = R_NegInf;
+    (*trans).xyzm_out_min[2] = R_NegInf;
+    (*trans).xyzm_out_min[3] = R_NegInf;
+
+    (*trans).xyzm_out_max[0] = R_PosInf;
+    (*trans).xyzm_out_max[1] = R_PosInf;
+    (*trans).xyzm_out_max[2] = R_PosInf;
+    (*trans).xyzm_out_max[3] = R_PosInf;
+
+    (*trans).trans = Some(wk_default_trans_trans);
+    (*trans).vector_end = Some(wk_default_trans_vector);
+    (*trans).finalizer = Some(wk_default_trans_finalizer);
+    (*trans).trans_data = std::ptr::null_mut();
+
+    trans
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn wk_trans_destroy(trans: *mut wk_trans_t) {
+    if !trans.is_null() {
+        ((*trans).finalizer.unwrap())((*trans).trans_data);
+        let layout = std::alloc::Layout::new::<wk_trans_t>();
+        std::alloc::dealloc(trans.cast(), layout);
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn wk_trans_destroy_xptr(trans_xptr: SEXP) {
+    wk_trans_destroy(R_ExternalPtrAddr(trans_xptr).cast())
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn wk_trans_create_xptr(
+    trans: *mut wk_trans_t,
+    tag: SEXP,
+    prot: SEXP,
+) -> SEXP {
+    let trans_xptr = Rf_protect(R_MakeExternalPtr(trans.cast(), tag, prot));
+    R_RegisterCFinalizer(trans_xptr, Some(wk_trans_destroy_xptr));
+    Rf_unprotect(1);
+    trans_xptr
 }
 
 // endregion
