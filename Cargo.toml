@@ -11,8 +11,9 @@ links = "wk"
 cc = "1"
 bindgen = "0.66"
 
+[dependencies]
+libR-sys = "0.5.0"
+
 [features]
 export_bindings = []
 
-[dependencies]
-libR-sys = "0.5.0"
