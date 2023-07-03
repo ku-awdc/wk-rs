@@ -9,11 +9,6 @@ pub mod bindings {
     pub mod wk_default_rust;
 }
 
-pub mod wk;
-
-#[cfg(feature = "geo-types")]
-pub mod wk_geo_types;
-
 #[cfg(test)]
 mod tests {
     use super::*;
