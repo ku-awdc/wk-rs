@@ -1,5 +1,4 @@
 pub mod bindings {
-
     pub mod wk {
         #![allow(non_snake_case)]
         #![allow(non_camel_case_types)]
@@ -32,11 +31,7 @@ pub mod bindings {
 
         // endregion
     }
-    pub mod wk_default {
-        use super::wk::*;
-        use libR_sys::*;
-        include!("bindings_wk_default_impl.rs");
-    }
+    pub mod wk_default_rust;
 }
 
 #[cfg(test)]
@@ -46,6 +41,6 @@ mod tests {
     #[test]
     fn test_linked_lib() {
         // this ensures that things are being built and linked properly.
-        let a_handler = unsafe { bindings::wk::wk_handler_create() };
+        let b_handler = unsafe { bindings::wk_default_rust::wk_handler_create() };
     }
 }

@@ -128,6 +128,14 @@ impl bindgen::callbacks::ParseCallbacks for AddMissingDerivs {
 
         result
     }
+
+    fn int_macro(&self, name: &str, _value: i64) -> Option<bindgen::callbacks::IntKind> {
+        use bindgen::callbacks::IntKind;
+        match name {
+            "WK_CONTINUE" | "WK_ABORT" | "WK_ABORT_FEATURE" => Some(IntKind::I32),
+            _ => None,
+        }
+    }
 }
 
 fn main() {
@@ -135,38 +143,8 @@ fn main() {
         println!("cargo:rustc-link-search=libgcc_mock");
     }
     let cppflags = run_r_cmd_config("--cppflags");
+    dbg!(&cppflags);
 
     #[cfg(feature = "export_bindings")]
     export_bindings(&cppflags);
-
-    let ldflags = run_r_cmd_config("--ldflags");
-    dbg!(&ldflags);
-
-    let mut wk_build = cc::Build::new();
-    let mut wk_build = wk_build
-        .cargo_metadata(true)
-        .file("wk/inst/include/wk-v1-impl.c");
-    for flag in cppflags
-        .split_ascii_whitespace()
-        .chain(ldflags.split_ascii_whitespace())
-    {
-        println!("cargo:rustc-link-arg={}", flag);
-        wk_build = wk_build.flag(flag);
-    }
-
-    let cxx23flags = run_r_cmd_config("CXX23FLAGS");
-    dbg!(&cxx23flags);
-    for flag in cxx23flags.split_ascii_whitespace() {
-        wk_build = wk_build.flag(flag);
-    }
-
-    wk_build
-        // -s, --strip-all             Strip all symbols
-        .flag("-s")
-        .debug(false)
-        // warning that isn't useful
-        .flag("-Wno-unused-parameter")
-        .extra_warnings(true)
-        .shared_flag(true)
-        .compile("wk");
 }
