@@ -142,8 +142,9 @@ pub unsafe extern "C" fn wk_handler_create_xptr(
     tag: SEXP,
     prot: SEXP,
 ) -> SEXP {
-    let xptr = R_MakeExternalPtr(handler.cast(), tag, prot);
+    let xptr = Rf_protect(R_MakeExternalPtr(handler.cast(), tag, prot));
     R_RegisterCFinalizerEx(xptr, Some(wk_handler_destroy_xptr), Rboolean_FALSE);
+    Rf_unprotect(1);
     xptr
 }
 
