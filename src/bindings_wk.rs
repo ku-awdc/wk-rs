@@ -99,7 +99,7 @@ pub struct wk_handler_t {
             handler_data: *mut ::std::os::raw::c_void,
         ) -> SEXP,
     >,
-    pub Rf_error: ::std::option::Option<
+    pub error: ::std::option::Option<
         unsafe extern "C" fn(
             message: *const ::std::os::raw::c_char,
             handler_data: *mut ::std::os::raw::c_void,

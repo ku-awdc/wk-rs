@@ -115,8 +115,7 @@ pub unsafe extern "C" fn wk_handler_create() -> *mut wk_handler_t {
 
     (*handler).coord = Some(wk_default_handler_coord);
 
-    //FIXME: this field is not mentioned in header of `wk_handler_t`.
-    // (*handler).error = Some(wk_default_handler_error);
+    (*handler).error = Some(wk_default_handler_error);
     (*handler).deinitialize = Some(wk_default_handler_finalizer);
     (*handler).finalizer = Some(wk_default_handler_finalizer);
 

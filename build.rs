@@ -76,6 +76,7 @@ fn export_bindings(cppflags: &String) {
     bindings
         .clone()
         .header("wk/inst/include/wk-v1.h")
+        .header_contents("configuration", "#define R_NO_REMAP")
         .parse_callbacks(Box::new(AddMissingDerivs))
         .generate()
         .unwrap()
