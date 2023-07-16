@@ -1,4 +1,6 @@
 {
     "rust-analyzer.cargo.buildScripts.enable": true,
-
+    "rust-analyzer.cargo.features": [
+        "export_bindings"
+    ],
 }

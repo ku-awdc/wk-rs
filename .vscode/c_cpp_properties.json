@@ -1,15 +1,20 @@
 {
+    "env": {
+        "R_HOME": "C:\\Users\\minin\\scoop\\apps\\r\\current"
+    },
     "configurations": [
         {
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/wk/inst/include"
+                "${workspaceFolder}/wk/inst/include",
+                "${env:R_HOME}/include"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+                "R_NO_REMAP"
             ],
             "windowsSdkVersion": "10.0.22000.0",
             "compilerPath": "cl.exe",
